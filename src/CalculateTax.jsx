@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Calculator, DollarSign, TrendingUp, Info } from "lucide-react";
-import NavBar from "./NavBar";
+import { Calculator, TrendingUp, Info } from "lucide-react";
 
 export default function TaxCalculator() {
   const [monthlyIncome, setMonthlyIncome] = useState("");
@@ -116,55 +115,62 @@ export default function TaxCalculator() {
     }).format(amount);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      calculateTax();
+    }
+  };
+
   return (
-    <div className="py-8 px-4">
+    <div className="min-h-screen py-4 sm:py-8 px-2 sm:px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-2xl mb-4">
-            <Calculator className="w-8 h-8 text-white" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-600 rounded-2xl mb-3 sm:mb-4">
+            <Calculator className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 px-4">
             Nigeria Tax Calculator 2025
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 px-4">
             Calculate your income tax based on the new 2025 tax reforms
           </p>
         </div>
 
         {/* Calculator Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-6">
-          <div className="mb-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="mb-4 sm:mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Monthly Income (₦)
             </label>
             <div className="relative">
-              <p className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <p className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base">
                 (₦)
               </p>
               <input
                 type="number"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Enter your monthly income"
-                className="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-base sm:text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
               />
             </div>
           </div>
 
           <button
             onClick={calculateTax}
-            className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-green-600 text-white py-3 sm:py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base"
           >
-            <TrendingUp className="w-5 h-5" />
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
             Calculate Tax
           </button>
         </div>
 
         {/* Tax Exemption Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-900">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 flex gap-2 sm:gap-3">
+          <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="text-xs sm:text-sm text-blue-900">
             <p className="font-semibold mb-1">Tax-Free Threshold</p>
             <p>
               Annual income of ₦800,000 or less (₦66,667/month) is exempt from
@@ -175,12 +181,14 @@ export default function TaxCalculator() {
 
         {/* Results */}
         {taxBreakdown && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-                <p className="text-sm text-gray-600 mb-1">Annual Tax</p>
-                <p className="text-2xl font-bold text-red-600">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-5">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                  Annual Tax
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-red-600">
                   {formatCurrency(taxBreakdown.totalTax)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -188,9 +196,11 @@ export default function TaxCalculator() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-                <p className="text-sm text-gray-600 mb-1">Net Income</p>
-                <p className="text-2xl font-bold text-green-600">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-5">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                  Net Income
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-green-600">
                   {formatCurrency(taxBreakdown.netAnnualIncome)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -198,9 +208,11 @@ export default function TaxCalculator() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-5">
-                <p className="text-sm text-gray-600 mb-1">Effective Rate</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-5">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">
+                  Effective Rate
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
                   {taxBreakdown.effectiveRate.toFixed(2)}%
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Of gross income</p>
@@ -208,20 +220,20 @@ export default function TaxCalculator() {
             </div>
 
             {/* Detailed Breakdown */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">
                 Income Breakdown
               </h3>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between py-2 border-b border-gray-100">
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                <div className="flex justify-between py-2 border-b border-gray-100 text-sm sm:text-base">
                   <span className="text-gray-600">Gross Annual Income</span>
                   <span className="font-semibold">
                     {formatCurrency(taxBreakdown.annualIncome)}
                   </span>
                 </div>
 
-                <div className="flex justify-between py-2 border-b border-gray-100">
+                <div className="flex justify-between py-2 border-b border-gray-100 text-sm sm:text-base">
                   <span className="text-gray-600">Tax-Free Allowance</span>
                   <span className="font-semibold text-green-600">
                     -{formatCurrency(800000)}
@@ -229,7 +241,7 @@ export default function TaxCalculator() {
                 </div>
 
                 {taxBreakdown.reliefs.rentRelief > 0 && (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
+                  <div className="flex justify-between py-2 border-b border-gray-100 text-sm sm:text-base">
                     <span className="text-gray-600">
                       Rent Relief (20%, max ₦500k)
                     </span>
@@ -240,7 +252,7 @@ export default function TaxCalculator() {
                 )}
 
                 {taxBreakdown.reliefs.pensionDeduction > 0 && (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
+                  <div className="flex justify-between py-2 border-b border-gray-100 text-sm sm:text-base">
                     <span className="text-gray-600">
                       Pension Contribution (8%)
                     </span>
@@ -250,7 +262,7 @@ export default function TaxCalculator() {
                   </div>
                 )}
 
-                <div className="flex justify-between py-2 border-b-2 border-gray-300">
+                <div className="flex justify-between py-2 border-b-2 border-gray-300 text-sm sm:text-base">
                   <span className="text-gray-900 font-semibold">
                     Taxable Income
                   </span>
@@ -262,21 +274,24 @@ export default function TaxCalculator() {
 
               {taxBreakdown.breakdown.length > 0 && (
                 <>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 mt-6">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 mt-4 sm:mt-6">
                     Tax Calculation by Bracket
                   </h3>
                   <div className="space-y-2">
                     {taxBreakdown.breakdown.map((bracket, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-lg p-3 sm:p-4"
+                      >
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-semibold text-gray-700">
+                          <span className="text-xs sm:text-sm font-semibold text-gray-700">
                             {bracket.range}
                           </span>
-                          <span className="text-sm font-bold text-green-600">
+                          <span className="text-xs sm:text-sm font-bold text-green-600">
                             {bracket.rate}
                           </span>
                         </div>
-                        <div className="flex justify-between text-sm">
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs sm:text-sm">
                           <span className="text-gray-600">
                             Taxable: {formatCurrency(bracket.taxableAmount)}
                           </span>
@@ -288,11 +303,11 @@ export default function TaxCalculator() {
                     ))}
                   </div>
 
-                  <div className="flex justify-between py-4 mt-4 border-t-2 border-gray-300">
-                    <span className="text-lg font-bold text-gray-900">
+                  <div className="flex justify-between py-3 sm:py-4 mt-3 sm:mt-4 border-t-2 border-gray-300">
+                    <span className="text-base sm:text-lg font-bold text-gray-900">
                       Total Annual Tax
                     </span>
-                    <span className="text-lg font-bold text-red-600">
+                    <span className="text-base sm:text-lg font-bold text-red-600">
                       {formatCurrency(taxBreakdown.totalTax)}
                     </span>
                   </div>
@@ -300,11 +315,11 @@ export default function TaxCalculator() {
               )}
 
               {taxBreakdown.totalTax === 0 && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                  <p className="text-green-800 font-semibold">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 text-center">
+                  <p className="text-green-800 font-semibold text-sm sm:text-base">
                     🎉 You pay no income tax!
                   </p>
-                  <p className="text-sm text-green-700 mt-1">
+                  <p className="text-xs sm:text-sm text-green-700 mt-1">
                     Your income is below the ₦800,000 exemption threshold.
                   </p>
                 </div>
