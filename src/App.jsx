@@ -78,6 +78,60 @@ function App() {
     }
   };
 
+  // Improved markdown parser
+  const parseMarkdown = (text) => {
+    // First, handle bullet points with asterisks at start of line
+    let parsed = text.replace(
+      /^\*\s+(.+)$/gm,
+      '<li class="ml-4 my-1.5">$1</li>'
+    );
+
+    // Handle bullet points with dash
+    parsed = parsed.replace(/^-\s+(.+)$/gm, '<li class="ml-4 my-1.5">$1</li>');
+
+    // Handle numbered lists
+    parsed = parsed.replace(
+      /^\d+\.\s+(.+)$/gm,
+      '<li class="ml-4 my-1.5">$1</li>'
+    );
+
+    // Now handle bold (must be done AFTER list items to avoid conflicts)
+    parsed = parsed.replace(
+      /\*\*(.+?)\*\*/g,
+      '<strong class="font-semibold text-gray-900">$1</strong>'
+    );
+
+    // Handle italic
+    parsed = parsed.replace(/\*(.+?)\*/g, '<em class="italic">$1</em>');
+
+    // Wrap consecutive <li> elements in <ul>
+    parsed = parsed.replace(/(<li.*?<\/li>\s*)+/g, (match) => {
+      return `<ul class="list-disc list-inside space-y-1.5 my-3">${match}</ul>`;
+    });
+
+    // Split into paragraphs and add spacing
+    const paragraphs = parsed.split("\n\n");
+    parsed = paragraphs
+      .map((para) => {
+        para = para.trim();
+        if (!para) return "";
+
+        // Don't wrap if it's already a list
+        if (para.startsWith("<ul")) {
+          return para;
+        }
+
+        // Replace single line breaks with <br>
+        para = para.replace(/\n/g, '<br class="my-1">');
+
+        return `<p class="my-3 leading-relaxed">${para}</p>`;
+      })
+      .filter((p) => p)
+      .join("");
+
+    return parsed;
+  };
+
   // Sample questions for quick start
   const sampleQuestions = [
     "What are the key changes in Nigeria's 2025 tax reform?",
@@ -127,14 +181,46 @@ function App() {
                 className={`max-w-[85%] sm:max-w-3xl rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
                   message.role === "user"
                     ? "bg-green-600 text-white"
-                    : "bg-gray-100 text-gray-900"
+                    : "bg-white border border-gray-200 text-gray-900 shadow-sm"
                 }`}
               >
-                <div className="prose prose-sm max-w-none">
+                {message.role === "user" ? (
                   <p className="whitespace-pre-wrap text-sm sm:text-base">
                     {message.content}
                   </p>
-                </div>
+                ) : (
+                  <div
+                    className="prose prose-sm max-w-none text-sm sm:text-base"
+                    dangerouslySetInnerHTML={{
+                      __html: parseMarkdown(message.content),
+                    }}
+                  />
+                )}
+
+                {/* Sources */}
+                {message.sources && message.sources.length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-xs font-semibold text-gray-700 mb-2">
+                      Sources:
+                    </p>
+                    <div className="space-y-1.5">
+                      {message.sources.map((source, idx) => (
+                        <div
+                          key={idx}
+                          className="text-xs text-gray-600 flex items-start gap-2"
+                        >
+                          <FileText className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <span className="block">{source.source}</span>
+                            <span className="text-green-600 font-medium">
+                              ({(source.similarity * 100).toFixed(1)}% match)
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {message.role === "user" && (
