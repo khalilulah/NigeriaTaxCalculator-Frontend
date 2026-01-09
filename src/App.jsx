@@ -82,11 +82,14 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
-      });
+      const response = await fetch(
+        "https://nigeriataxcalculator-backend.onrender.com/chat",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage }),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to get response");
 
