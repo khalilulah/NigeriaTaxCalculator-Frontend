@@ -4,12 +4,16 @@ import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App.jsx";
 import TaxCalculator from "./CalculateTax.jsx";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+
 import NavBar from "./NavBar.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <NavBar />
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/calculator" element={<TaxCalculator />} />
