@@ -22,7 +22,6 @@ function NavBar() {
       label: "Calculator",
       link: "/calculator",
     },
-    { id: "history", icon: History, label: "History", link: "/history" },
   ];
 
   const activeTab = tabs.find((tab) => tab.link === location.pathname)?.id;
