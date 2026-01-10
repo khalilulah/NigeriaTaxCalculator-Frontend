@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Scale, MoreVertical, Copy } from "lucide-react";
 import NavBar from "./NavBar";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function App() {
   const [chatMessages, setChatMessages] = useState([
@@ -101,42 +103,8 @@ function App() {
     }
   };
 
-  const parseMarkdown = (text) => {
-    let parsed = text.replace(
-      /^\*\s+(.+)$/gm,
-      '<li class="ml-4 my-1.5">$1</li>'
-    );
-    parsed = parsed.replace(/^-\s+(.+)$/gm, '<li class="ml-4 my-1.5">$1</li>');
-    parsed = parsed.replace(
-      /^\d+\.\s+(.+)$/gm,
-      '<li class="ml-4 my-1.5">$1</li>'
-    );
-    parsed = parsed.replace(
-      /\*\*(.+?)\*\*/g,
-      '<strong class="font-semibold text-white">$1</strong>'
-    );
-    parsed = parsed.replace(/\*(.+?)\*/g, '<em class="italic">$1</em>');
-    parsed = parsed.replace(/(<li.*?<\/li>\s*)+/g, (match) => {
-      return `<ul class="list-disc list-inside space-y-1.5 my-3">${match}</ul>`;
-    });
-
-    const paragraphs = parsed.split("\n\n");
-    parsed = paragraphs
-      .map((para) => {
-        para = para.trim();
-        if (!para) return "";
-        if (para.startsWith("<ul")) return para;
-        para = para.replace(/\n/g, '<br class="my-1">');
-        return `<p class="my-3 leading-relaxed">${para}</p>`;
-      })
-      .filter((p) => p)
-      .join("");
-
-    return parsed;
-  };
-
   return (
-    <div className="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 overflow-hidden">
+    <div className="min-h-screen h-auto sm:flex sm:h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 ">
       <NavBar />
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -199,7 +167,7 @@ function App() {
               {chatMessages.map((message, index) => (
                 <div
                   key={index}
-                  className={`flex gap-2 sm:gap-4 ${
+                  className={`flex gap-2 sm:gap-4 max-w-full overflow-x-hidden ${
                     message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
@@ -209,7 +177,13 @@ function App() {
                     </div>
                   )}
 
-                  <div className="flex flex-col max-w-[85%] sm:max-w-2xl">
+                  <div
+                    className={`flex flex-col w-full min-w-0 ${
+                      message.role === "user"
+                        ? "max-w-[85%] sm:max-w-2xl"
+                        : "max-w-[90%] sm:max-w-2xl"
+                    }`}
+                  >
                     <div
                       className={`rounded-xl sm:rounded-2xl px-3 py-3 sm:px-5 sm:py-4 ${
                         message.role === "user"
@@ -220,12 +194,32 @@ function App() {
                       {message.role === "user" ? (
                         <p className="text-xs sm:text-sm">{message.content}</p>
                       ) : (
-                        <div
-                          className="prose prose-sm prose-invert max-w-none text-gray-300 leading-relaxed text-xs sm:text-sm"
-                          dangerouslySetInnerHTML={{
-                            __html: parseMarkdown(message.content),
-                          }}
-                        />
+                        <div className="prose prose-sm prose-invert max-w-none text-gray-300 leading-relaxed">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              table: ({ children }) => (
+                                <div className="overflow-x-auto my-4">
+                                  <table className="border border-slate-600/50 rounded-lg">
+                                    {children}
+                                  </table>
+                                </div>
+                              ),
+                              th: ({ children }) => (
+                                <th className="border border-slate-600 px-3 py-2 bg-slate-700 text-white text-left">
+                                  {children}
+                                </th>
+                              ),
+                              td: ({ children }) => (
+                                <td className="border border-slate-600 px-3 py-2 text-gray-300">
+                                  {children}
+                                </td>
+                              ),
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </div>
 
@@ -239,21 +233,6 @@ function App() {
                         </button>
                       )}
                     </div>
-
-                    {message.sources && message.sources.length > 0 && (
-                      <div className="mt-2 sm:mt-3 px-3 py-2 sm:px-5 sm:py-3 bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-lg sm:rounded-xl">
-                        <p className="text-xs font-semibold text-purple-300 mb-1.5 sm:mb-2">
-                          Sources:
-                        </p>
-                        <div className="space-y-1">
-                          {message.sources.map((source, idx) => (
-                            <div key={idx} className="text-xs text-purple-200">
-                              <span>{source.source}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {message.role === "user" && (
