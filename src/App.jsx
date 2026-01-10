@@ -3,19 +3,14 @@ import { Send, Scale, MoreVertical, Copy } from "lucide-react";
 import NavBar from "./NavBar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useChatStore } from "./store/chatStore";
 
 function App() {
-  const [chatMessages, setChatMessages] = useState([
-    {
-      role: "assistant",
-      content:
-        "Hello! I'm your Nigeria Tax Assistant. Ask me anything about Nigeria's 2025 tax reforms and I'll help you understand the new tax laws.",
-      timestamp: "Just now",
-    },
-  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatMessages = useChatStore((state) => state.chatMessages);
+  const addMessage = useChatStore((state) => state.addMessage);
 
   const sampleQuestions = [
     "What are the key changes in Nigeria's 2025 tax reform?",
@@ -48,7 +43,8 @@ function App() {
         minute: "2-digit",
       }),
     };
-    setChatMessages((prev) => [...prev, newUserMessage]);
+    addMessage(newUserMessage);
+
     setIsLoading(true);
 
     try {
@@ -65,32 +61,24 @@ function App() {
 
       const data = await response.json();
 
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.answer,
-          sources: data.sources || [],
-          timestamp: new Date().toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+      addMessage({
+        role: "assistant",
+        content: data.answer,
+        timestamp: new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+      });
     } catch (error) {
       console.error("Error:", error);
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I encountered an error. Please try again.",
-          sources: [],
-          timestamp: new Date().toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+      addMessage({
+        role: "assistant",
+        content: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date().toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -227,11 +215,6 @@ function App() {
                       <span className="text-xs text-purple-300">
                         {message.timestamp || "Just now"}
                       </span>
-                      {message.role === "assistant" && (
-                        <button className="text-purple-300 hover:text-purple-200 transition-colors">
-                          <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                        </button>
-                      )}
                     </div>
                   </div>
 
